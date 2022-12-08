@@ -2,7 +2,7 @@
 
 #include <Stepper.h>
 const int stepsPerRevolution = 200;  // change this to fit the number of steps per revolution
-Stepper myStepper(stepsPerRevolution, 8, 9, 10, 11); //pins
+Stepper myStepper(stepsPerRevolution, 22, 24, 26, 28); //pins
 int stepCount = 0;         // number of steps the motor has taken
 
 #include <dht_nonblocking.h>
@@ -18,6 +18,14 @@ DHT_nonblocking dht_sensor( DHT_SENSOR_PIN, DHT_SENSOR_TYPE );
 
 volatile unsigned char *portDDRB = (unsigned char *) 0x24; //Example Ports for LEDs and Buttons
 volatile unsigned char *portB =    (unsigned char *) 0x25;
+//red LED = pin 48
+//green LED = pin 50
+//blue LED = pin 52
+//DC motor = pin 3
+//start button = 34
+//stop button = 35
+//step up button = 36
+//step down button = 37
 
 bool start = false;
 
