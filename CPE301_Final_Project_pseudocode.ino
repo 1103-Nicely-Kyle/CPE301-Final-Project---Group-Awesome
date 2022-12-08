@@ -38,8 +38,8 @@ void setup()
   //*portDDRB |= 0x40; //Set PB6 to output
   //*portB &= 0xBF; //Initialize to low
 
-  //State = Disabled
-  //Set LED to Yellow
+  //State = IDLE
+  //Set LED to Green 
 }
 
 static bool measure_environment( float *temperature, float *humidity )
@@ -110,6 +110,12 @@ void loop()
   if(stepper button 2 is pressed){
     myStepper.step(-1);
     stepCount--;
+  }
+  
+  if(stop button is pressed){ 
+    //State = Disabled
+    //Set LED to Yellow
+    //start = false
   }
   */
 }
