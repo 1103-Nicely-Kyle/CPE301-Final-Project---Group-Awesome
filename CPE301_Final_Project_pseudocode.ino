@@ -52,10 +52,11 @@ void setup()
   *ddr_e |= 0x2; //Set PE1 to output
   *ddr_g |= 0x2; //Set PG1 to output
   *ddr_l &= 0x0 //Set PL0, PL1, PL2, PL3 to input
-  //*portB &= 0xBF; //Initialize to low
+  //*portB &= 0xBF; //example Initialize to low
 
-  //State = IDLE
-  //Set LED to Green 
+  //State = Disabled
+  //Set LED to Yellow
+  //Fan Off
 }
 
 static bool measure_environment( float *temperature, float *humidity )
@@ -81,8 +82,10 @@ void loop()
     start = true;
     //State = Idle
     //Set LED to Green
+    //Fan Off
   }*/
 
+  //while stop button is not pressed and system is started
   while((!(*pin_l) & 0x2) && start == true){
 
     int value = analogRead(adc_id);
@@ -114,10 +117,16 @@ void loop()
       lcd.print("%");
     }
 
-    /* 
+    //if temperature less than tempThreshold
     if(temperature < tempThreshold){
-    //State = idle
-    //Set the LED to Green
+      //State = idle
+      //Set the LED to Green
+      //Turn off fan
+    }
+    else{
+      //State = Running
+      //Set the LED to Blue
+      //Turn on Fan
     }
 
     //if step up button is pressed
@@ -131,13 +140,12 @@ void loop()
       myStepper.step(-1);
       stepCount--;
     }
-
-    //if stop button is pressed
-    if(*pin_l & 0x2){ 
-      //State = Disabled
-      //Set LED to Yellow
-      start = false;
-    }
-    */
+  }
+  
+  //if stop button is pressed
+  if(*pin_l & 0x2){ 
+    //State = Disabled
+    //Set LED to Yellow
+    start = false;
   }
 }
