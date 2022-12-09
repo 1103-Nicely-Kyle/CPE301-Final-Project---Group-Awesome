@@ -56,7 +56,9 @@ void setup()
 
   //State = Disabled
   //Set LED to Yellow
+  *pin_d |= 0xA0;
   //Fan Off
+  *pin_e &= 0x0;
 }
 
 static bool measure_environment( float *temperature, float *humidity )
@@ -82,7 +84,9 @@ void loop()
     start = true;
     //State = Idle
     //Set LED to Green
+    *pin_d |= 0x80;
     //Fan Off
+    *pin_e &= 0x0;
   }*/
 
   //while stop button is not pressed and system is started
@@ -97,6 +101,7 @@ void loop()
         Serial.print(printBuffer);
         //State = Error 
         //Set the LED to Red
+        *pin_d |= 0x20;
       }
       HistoryValue = value;
     }
@@ -121,12 +126,18 @@ void loop()
     if(temperature < tempThreshold){
       //State = idle
       //Set the LED to Green
+      *pin_d &= 0x0;
+      *pin_d |= 0x80;
       //Turn off fan
+      *pin_e &= 0x0;
     }
     else{
       //State = Running
       //Set the LED to Blue
+      *pin_d &= 0x0;
+      *pin_g |= 0x2;
       //Turn on Fan
+      *pin_e |= 0x2;
     }
 
     //if step up button is pressed
@@ -146,6 +157,11 @@ void loop()
   if(*pin_l & 0x2){ 
     //State = Disabled
     //Set LED to Yellow
+    *pin_d &= 0x0;
+    *pin_d |= 0xA0;
+    //Turn off Fan
+    *pin_e &= 0x0;
     start = false;
+    
   }
 }
