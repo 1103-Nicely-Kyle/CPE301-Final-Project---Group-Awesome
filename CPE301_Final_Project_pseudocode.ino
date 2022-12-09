@@ -16,26 +16,42 @@ char printBuffer[128];
 static const int DHT_SENSOR_PIN = 2;
 DHT_nonblocking dht_sensor( DHT_SENSOR_PIN, DHT_SENSOR_TYPE );
 
-volatile unsigned char *portDDRB = (unsigned char *) 0x24; //Example Ports for LEDs and Buttons
-volatile unsigned char *portB =    (unsigned char *) 0x25;
-//red LED = pin 48
-//green LED = pin 50
-//blue LED = pin 52
-//DC motor = pin 3
-//start button = 34
-//stop button = 35
-//step up button = 36
-//step down button = 37
+volatile unsigned char* port_d = (unsigned char*) 0x2B; //Ports for LEDs and Buttons
+volatile unsigned char* ddr_d  = (unsigned char*) 0x2A; 
+volatile unsigned char* pin_d  = (unsigned char*) 0x29; 
+
+volatile unsigned char* port_e = (unsigned char*) 0x2E; 
+volatile unsigned char* ddr_e  = (unsigned char*) 0x2D; 
+volatile unsigned char* pin_e  = (unsigned char*) 0x2C; 
+
+volatile unsigned char* port_g = (unsigned char*) 0x34; 
+volatile unsigned char* ddr_g = (unsigned char*) 0x33; 
+volatile unsigned char* pin_g  = (unsigned char*) 0x32; 
+
+volatile unsigned char* port_l = (unsigned char*) 0x10B; 
+volatile unsigned char* ddr_l  = (unsigned char*) 0x10A; 
+volatile unsigned char* pin_l  = (unsigned char*) 0x109; 
+
+//red LED = pin 48 - PD5   OUTPUT
+//green LED = pin 50 - PD7 OUTPUT
+//blue LED = pin 52 - PG1  OUTPUT
+//DC motor = pin 3 - PE1   OUTPUT
+//start button = 35 - PL0      INPUT
+//stop button = 36 - PL1       INPUT
+//step up button = 37 - PL2    INPUT
+//step down button = 38 - PL3  INPUT
 
 bool start = false;
-
 
 void setup()
 {
   Serial.begin(9600);
   lcd.begin(16, 2);
 
-  //*portDDRB |= 0x40; //Set PB6 to output
+  *ddr_d |= 0xA0; //Set PD7 and PD5 to output
+  *ddr_e |= 0x2; //Set PE1 to output
+  *ddr_g |= 0x2; //Set PG1 to output
+  *ddr_l &= 0x0 //Set PL0, PL1, PL2, PL3 to input
   //*portB &= 0xBF; //Initialize to low
 
   //State = IDLE
