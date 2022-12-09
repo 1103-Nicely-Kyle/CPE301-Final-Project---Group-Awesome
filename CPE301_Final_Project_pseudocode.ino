@@ -84,6 +84,7 @@ void loop()
     start = true;
     //State = Idle
     //Set LED to Green
+    *pin_d &= 0x0;
     *pin_d |= 0x80;
     //Fan Off
     *pin_e &= 0x0;
@@ -101,6 +102,7 @@ void loop()
         Serial.print(printBuffer);
         //State = Error 
         //Set the LED to Red
+        *pin_d &= 0x0;
         *pin_d |= 0x20;
       }
       HistoryValue = value;
