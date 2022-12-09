@@ -32,10 +32,10 @@ volatile unsigned char* port_l = (unsigned char*) 0x10B;
 volatile unsigned char* ddr_l  = (unsigned char*) 0x10A; 
 volatile unsigned char* pin_l  = (unsigned char*) 0x109; 
 
-//red LED = pin 48 - PD5   OUTPUT
-//green LED = pin 50 - PD7 OUTPUT
-//blue LED = pin 52 - PG1  OUTPUT
-//DC motor = pin 3 - PE1   OUTPUT
+//red LED = pin 48 - PD5       OUTPUT
+//green LED = pin 50 - PD7     OUTPUT
+//blue LED = pin 52 - PG1      OUTPUT
+//DC motor = pin 3 - PE1       OUTPUT
 //start button = 35 - PL0      INPUT
 //stop button = 36 - PL1       INPUT
 //step up button = 37 - PL2    INPUT
@@ -76,13 +76,14 @@ static bool measure_environment( float *temperature, float *humidity )
 
 void loop()
 {
-  if(start pushed is pressed){
-  //start = true;
-  //State = Idle
-  //Set LED to Green
+  //if start button is high 
+  if(*pin_l & 0x1){
+    start = true;
+    //State = Idle
+    //Set LED to Green
   }*/
 
-  //while(stop button is not pushed && start == true){
+  while((!(*pin_l) & 0x2) && start == true){
 
     int value = analogRead(adc_id);
 
@@ -91,47 +92,52 @@ void loop()
       if(value < 200) {
         sprintf(printBuffer,"Water level low\n");
         Serial.print(printBuffer);
-    //State = Error 
-    //Set the LED to Red
+        //State = Error 
+        //Set the LED to Red
       }
       HistoryValue = value;
     }
       int value2 = analogRead(adc_id);
 
-  float temperature;
-  float humidity;
+    float temperature;
+    float humidity;
 
-  if( measure_environment( &temperature, &humidity ) == true )
-  {
-    lcd.setCursor(0, 0);
-    lcd.print("T = ");
-    lcd.print(temperature, 1);
-    lcd.print(" deg. C");
-    lcd.setCursor(0, 1);
-    lcd.print("H = ");
-    lcd.print(humidity, 1);
-    lcd.print("%");
-  }
+    if( measure_environment( &temperature, &humidity ) == true )
+    {
+      lcd.setCursor(0, 0);
+      lcd.print("T = ");
+      lcd.print(temperature, 1);
+      lcd.print(" deg. C");
+      lcd.setCursor(0, 1);
+      lcd.print("H = ");
+      lcd.print(humidity, 1);
+      lcd.print("%");
+    }
 
-  /* if(temperature < tempThreshold){
-  //State = idle
-  //Set the LED to Green
-  }
+    /* 
+    if(temperature < tempThreshold){
+    //State = idle
+    //Set the LED to Green
+    }
 
-  if(stepper button 1 is pressed){
-    myStepper.step(1);
-    stepCount++;
-  }
+    //if step up button is pressed
+    if(*pin_l & 0x4){
+      myStepper.step(1);
+      stepCount++;
+    }
 
-  if(stepper button 2 is pressed){
-    myStepper.step(-1);
-    stepCount--;
+    //if step down is pressed
+    if(*pin_l & 0x8){
+      myStepper.step(-1);
+      stepCount--;
+    }
+
+    //if stop button is pressed
+    if(*pin_l & 0x2){ 
+      //State = Disabled
+      //Set LED to Yellow
+      start = false;
+    }
+    */
   }
-  
-  if(stop button is pressed){ 
-    //State = Disabled
-    //Set LED to Yellow
-    //start = false
-  }
-  */
 }
