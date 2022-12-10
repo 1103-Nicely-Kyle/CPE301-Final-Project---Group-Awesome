@@ -16,6 +16,14 @@ char printBuffer[128];
 static const int DHT_SENSOR_PIN = 2;
 DHT_nonblocking dht_sensor( DHT_SENSOR_PIN, DHT_SENSOR_TYPE );
 
+volatile unsigned char* port_b = (unsigned char*) 0x25; //Ports for LEDs and Buttons
+volatile unsigned char* ddr_b  = (unsigned char*) 0x24; 
+volatile unsigned char* pin_b  = (unsigned char*) 0x23; 
+
+volatile unsigned char* port_c = (unsigned char*) 0x28; //Ports for LEDs and Buttons
+volatile unsigned char* ddr_c  = (unsigned char*) 0x27; 
+volatile unsigned char* pin_c  = (unsigned char*) 0x26; 
+
 volatile unsigned char* port_d = (unsigned char*) 0x2B; //Ports for LEDs and Buttons
 volatile unsigned char* ddr_d  = (unsigned char*) 0x2A; 
 volatile unsigned char* pin_d  = (unsigned char*) 0x29; 
@@ -32,14 +40,15 @@ volatile unsigned char* port_l = (unsigned char*) 0x10B;
 volatile unsigned char* ddr_l  = (unsigned char*) 0x10A; 
 volatile unsigned char* pin_l  = (unsigned char*) 0x109; 
 
-//red LED = pin 48 - PD5       OUTPUT
-//green LED = pin 50 - PD7     OUTPUT
-//blue LED = pin 52 - PG1      OUTPUT
-//DC motor = pin 3 - PE1       OUTPUT
-//start button = 35 - PL0      INPUT
-//stop button = 36 - PL1       INPUT
-//step up button = 37 - PL2    INPUT
-//step down button = 38 - PL3  INPUT
+//yellow LED = pin 42 - PL7    OUTPUT
+//red LED = pin 48 - PL1       OUTPUT
+//green LED = pin 50 - PB3     OUTPUT
+//blue LED = pin 52 - PB1      OUTPUT
+//DC motor = pin 3 - PE5       OUTPUT
+//start button = 37 - PC0      INPUT
+//stop button = 36 - PC1       INPUT
+//step up button = 35 - PC2    INPUT
+//step down button = 34 - PC3  INPUT
 
 bool start = false;
 
@@ -48,15 +57,18 @@ void setup()
   Serial.begin(9600);
   lcd.begin(16, 2);
 
-  *ddr_d |= 0xA0; //Set PD7 and PD5 to output
-  *ddr_e |= 0x2; //Set PE1 to output
-  *ddr_g |= 0x2; //Set PG1 to output
-  *ddr_l &= 0x0 //Set PL0, PL1, PL2, PL3 to input
+  *ddr_l |= 0x82; //Set PL1 to output
+  *ddr_e |= 0x10; //Set PE5 to output
+  *ddr_b |= 0xA; //Set PB1 and PB3 to output
+  *ddr_c &= 0xF0; //Set PC0, PC1, PC2, PC3 to input
   //*portB &= 0xBF; //example Initialize to low
+  *pin_l &= 0x0; //Initialize to Low
+  *pin_b &= 0x0;
 
   //State = Disabled
   //Set LED to Yellow
-  *pin_d |= 0xA0;
+  *pin_l &= 0x0;
+  *pin_l |= 0x80;
   //Fan Off
   *pin_e &= 0x0;
 }
@@ -80,18 +92,20 @@ static bool measure_environment( float *temperature, float *humidity )
 void loop()
 {
   //if start button is high 
-  if(*pin_l & 0x1){
+  if(*pin_c & 0x1){
+    Serial.print("button pressed");
     start = true;
     //State = Idle
     //Set LED to Green
-    *pin_d &= 0x0;
-    *pin_d |= 0x80;
+    *pin_b &= 0x0;
+    *pin_l &= 0x0;
+    *pin_b |= 0x8;
     //Fan Off
     *pin_e &= 0x0;
-  }*/
+  }
 
   //while stop button is not pressed and system is started
-  while((!(*pin_l) & 0x2) && start == true){
+  while((!(*pin_c) & 0x2) && start == true){
 
     int value = analogRead(adc_id);
 
@@ -103,7 +117,10 @@ void loop()
         //State = Error 
         //Set the LED to Red
         *pin_d &= 0x0;
-        *pin_d |= 0x20;
+        *pin_l |= 0x2;
+        //Fan Off
+        *pin_e &= 0x0;
+        start = false;
       }
       HistoryValue = value;
     }
@@ -125,42 +142,45 @@ void loop()
     }
 
     //if temperature less than tempThreshold
-    if(temperature < tempThreshold){
+    if(temperature < 21){
       //State = idle
       //Set the LED to Green
-      *pin_d &= 0x0;
-      *pin_d |= 0x80;
+      *pin_b &= 0x0;
+      *pin_l &= 0x0;
+      *pin_b |= 0x8;
       //Turn off fan
       *pin_e &= 0x0;
     }
     else{
       //State = Running
       //Set the LED to Blue
-      *pin_d &= 0x0;
-      *pin_g |= 0x2;
+      *pin_b &= 0x0;
+      *pin_l &= 0x0;
+      *pin_b |= 0x2;
       //Turn on Fan
-      *pin_e |= 0x2;
+      *pin_e |= 0x20;
     }
 
     //if step up button is pressed
-    if(*pin_l & 0x4){
+    if(*pin_c & 0x4){
       myStepper.step(1);
       stepCount++;
     }
 
     //if step down is pressed
-    if(*pin_l & 0x8){
+    if(*pin_c & 0x8){
       myStepper.step(-1);
       stepCount--;
     }
   }
   
   //if stop button is pressed
-  if(*pin_l & 0x2){ 
+  if(*pin_c & 0x2){ 
     //State = Disabled
     //Set LED to Yellow
-    *pin_d &= 0x0;
-    *pin_d |= 0xA0;
+    *pin_b &= 0x0;
+    *pin_l &= 0x0;
+    *pin_l |= 0x80;
     //Turn off Fan
     *pin_e &= 0x0;
     start = false;
