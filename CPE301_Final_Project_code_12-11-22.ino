@@ -136,6 +136,7 @@ void loop()
 
     if( measure_environment( &temperature, &humidity ) == true )
     {
+      Serial.print("environment measured");
       lcd.setCursor(0, 0);
       lcd.print("T = ");
       lcd.print(temperature, 1);
